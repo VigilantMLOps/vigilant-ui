@@ -28,7 +28,20 @@ npm install
 npm run dev
 ```
 
-The app runs on `http://localhost:5173` and connects to the backend at `https://vigilant-mlops.onrender.com`.
+The app runs on `http://localhost:5173` and connects to the backend at `https://vigilant-mlops.onrender.com` by default.
+
+## Docker
+
+```bash
+docker build -t vigilant-ui .
+docker run -p 8080:80 -e API_URL=https://your-backend.example.com vigilant-ui
+```
+
+| Variable | Default | Description |
+|---|---|---|
+| `API_URL` | `https://vigilant-mlops.onrender.com` | Backend API base URL |
+
+The entrypoint injects `API_URL` into `env.js` at container startup, so the same image can be used across environments without rebuilding.
 
 ## Scripts
 
