@@ -1,6 +1,6 @@
 # Vigilant UI
 
-The frontend dashboard for [Vigilant MLOps](https://github.com/VigilantMLOps/legacy-vigilant-mlops) — a platform for monitoring ML model health, evaluations, and feature drift.
+The frontend dashboard for [vigilant-api](https://github.com/VigilantMLOps/vigilant-api) — a dashboard for ML model evaluations, incidents, and feature drift.
 
 ## Tech Stack
 
@@ -9,17 +9,16 @@ The frontend dashboard for [Vigilant MLOps](https://github.com/VigilantMLOps/leg
 - **Tailwind CSS** — styling
 - **React Router v7** — client-side routing
 - **TanStack Query** — data fetching and caching
-- **Recharts** — charts and sparklines
+- **Recharts** — charts
 - **Axios** — HTTP client
-- **Supabase** — auth and real-time data
 
 ## Pages
 
 | Route | Page | Description |
 |---|---|---|
-| `/` | Overview | High-level model health summary and stats |
-| `/evaluation` | Evaluation | Model evaluation results and metrics |
-| `/feature-drift` | Feature Drift | Feature distribution drift monitoring |
+| `/` | Overview | Live incidents, latest model metrics, time-window filter |
+| `/evaluation` | Evaluation | Pre-prod metrics, ROC curve, confusion matrix, per-feature stats |
+| `/feature-drift` | Feature Drift | PSI / KS / Chi² drift detection against the production baseline |
 
 ## Getting Started
 
@@ -28,7 +27,9 @@ npm install
 npm run dev
 ```
 
-The app runs on `http://localhost:5173` and connects to the backend at `https://vigilant-mlops.onrender.com` by default.
+The app runs on `http://localhost:5173` and connects to the deployed backend at `https://vigilant-api.duckdns.org` by default.
+
+To point it elsewhere, edit [`public/env.js`](public/env.js) — its `window.__env__.API_URL` is loaded by `index.html` before the bundle and takes precedence over the build-time default. (You can also set `VITE_API_URL` at build time, but the runtime override is what the Docker image uses.)
 
 ## Docker
 
@@ -39,9 +40,11 @@ docker run -p 8080:80 -e API_URL=https://your-backend.example.com vigilant-ui
 
 | Variable | Default | Description |
 |---|---|---|
-| `API_URL` | `https://vigilant-mlops.onrender.com` | Backend API base URL |
+| `API_URL` | `https://vigilant-api.duckdns.org` | Backend API base URL |
 
-The entrypoint injects `API_URL` into `env.js` at container startup, so the same image can be used across environments without rebuilding.
+The entrypoint rewrites `env.js` with the value of `$API_URL` at container startup, so the same image can be promoted across environments without rebuilding.
+
+The image ships an nginx config (`nginx.conf`) with an SPA `try_files` fallback so deep links and refreshes resolve to `index.html`. `env.js` is served `no-store` so a deploy that changes `API_URL` takes effect on the next page load; hashed assets under `/assets/` get a 1-year immutable cache.
 
 ## Scripts
 
@@ -56,10 +59,15 @@ The entrypoint injects `API_URL` into `env.js` at container startup, so the same
 ## Project Structure
 
 ```
+public/
+└── env.js        # Runtime config (window.__env__.API_URL) — overwritten by Docker entrypoint
 src/
 ├── api/          # Axios client, API functions, and types
 ├── components/   # Shared UI components (StatCard, Sparkline)
-├── context/      # React context (FiltersContext)
+├── context/      # React context (filters)
 ├── layout/       # Shell, Header, Sidebar
-└── pages/        # Route-level page components
+└── pages/        # Route-level page components (Overview, Evaluation, FeatureDrift)
+Dockerfile        # Multi-stage build → nginx:alpine
+nginx.conf        # SPA fallback + cache headers
+docker-entrypoint.sh  # Injects API_URL into env.js at startup
 ```

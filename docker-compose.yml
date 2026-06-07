@@ -1,0 +1,10 @@
+services:
+
+  ui:
+    build: .
+    container_name: vigilant-ui
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      - API_URL=${API_URL:-https://vigilant-api.duckdns.org}

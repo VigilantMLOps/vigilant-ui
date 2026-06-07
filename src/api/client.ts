@@ -7,7 +7,7 @@ declare global {
 }
 
 const apiClient = axios.create({
-  baseURL: window.__env__?.API_URL ?? import.meta.env.VITE_API_URL ?? 'https://vigilant-mlops.onrender.com',
+  baseURL: window.__env__?.API_URL ?? import.meta.env.VITE_API_URL ?? 'https://vigilant-api.duckdns.org',
   headers: { 'Content-Type': 'application/json' },
   timeout: 60000,
 });

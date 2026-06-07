@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, CheckCircle2, XCircle, Clock, Loader2, RefreshCw, X, Hash, Tag, FileText, Calendar } from 'lucide-react';
-import { useFilters } from '../context/FiltersContext';
+import { useFilters } from '../context/filters';
 import StatCard from '../components/StatCard';
 import { fetchIncidents, fetchReportHistory } from '../api';
 import type { IncidentRecord } from '../api/types';
@@ -205,7 +205,7 @@ export default function Overview() {
   const latestPreProd =
     reports?.find((r) => r.report_type === 'PRE_PROD' && r.model_version === modelVersion) ??
     reports?.find((r) => r.report_type === 'PRE_PROD');
-  const metrics = latestPreProd?.metrics;
+  const metrics = latestPreProd?.content;
 
   const criticalCount = visibleIncidents.filter((i) => i.severity === 'CRITICAL').length;
   const warningCount = visibleIncidents.filter((i) => i.severity === 'WARNING').length;

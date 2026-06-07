@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useFilters } from '../context/FiltersContext';
+import { useFilters } from '../context/filters';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   RadarChart, PolarGrid, PolarAngleAxis, Radar,
@@ -96,8 +96,8 @@ function ModelTab({ reports, modelVersion }: { reports: ReportRecord[]; modelVer
     (r) => r.report_type === 'PRE_PROD' && (!modelVersion || r.model_version === modelVersion)
   );
   const latest = preProdReports[0];
-  const metrics = latest?.metrics;
-  const artifacts = latest?.artifacts;
+  const metrics = latest?.content;
+  const artifacts = latest?.content;
 
   const fmtPct = (v?: number | null) => (v != null ? `${(v * 100).toFixed(1)}%` : '—');
 
@@ -134,9 +134,9 @@ function ModelTab({ reports, modelVersion }: { reports: ReportRecord[]; modelVer
     .reverse()
     .map((r: ReportRecord, i: number) => ({
       run: `Run ${i + 1}`,
-      accuracy: r.metrics?.accuracy ?? null,
-      precision: r.metrics?.precision ?? null,
-      recall: r.metrics?.recall ?? null,
+      accuracy: r.content?.accuracy ?? null,
+      precision: r.content?.precision ?? null,
+      recall: r.content?.recall ?? null,
     }));
 
   // Build ROC curve data, sampled to ≤150 points for performance
@@ -398,8 +398,8 @@ function DataTab({ reports }: { reports: ReportRecord[] }) {
   }
 
   const selected = dataReports.find((r) => r.report_id === selectedId) ?? dataReports[0];
-  const m = selected.metrics;
-  const features: FeatureStats[] = (selected.artifacts?.features ?? []) as FeatureStats[];
+  const m = selected.content;
+  const features: FeatureStats[] = (selected.content?.features ?? []) as FeatureStats[];
 
   const classDist = m?.class_distribution ?? {};
   const totalSamples = Object.values(classDist).reduce((a, b) => a + b, 0);

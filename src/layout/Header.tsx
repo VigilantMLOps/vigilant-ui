@@ -2,9 +2,9 @@ import { ChevronDown, Bell, Clock, Cpu, XCircle, AlertTriangle, CheckCircle2, Ac
 import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchReportHistory, fetchIncidents } from '../api';
-import { useFilters, TIME_WINDOWS } from '../context/FiltersContext';
+import { useFilters, TIME_WINDOWS } from '../context/filters';
 import type { IncidentRecord } from '../api/types';
-import type { TimeWindow } from '../context/FiltersContext';
+import type { TimeWindow } from '../context/filters';
 
 function Dropdown({
   icon: Icon,

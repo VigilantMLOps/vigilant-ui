@@ -1,23 +1,3 @@
-export interface ReportMetrics {
-  // PRE_PROD fields
-  accuracy?: number;
-  precision?: number;
-  recall?: number;
-  f1?: number;
-  roc_auc?: number;
-  avg_precision?: number;
-  // DATA_EVAL fields
-  split?: string;
-  stage?: string;
-  n_rows?: number;
-  n_features?: number;
-  class_distribution?: Record<string, number>;
-  imbalance_ratio?: number;
-  duplicate_rows?: number;
-  missing_cells?: number;
-  [key: string]: unknown;
-}
-
 export interface FeatureStats {
   name: string;
   dtype: string;
@@ -33,12 +13,31 @@ export interface FeatureStats {
   max?: number | null;
 }
 
-export interface ReportArtifacts {
+// The backend collapsed the legacy `metrics` and `artifacts` columns into a
+// single `content` JSONB payload, so every report type now flattens its fields
+// into one bag here.
+export interface ReportContent {
+  // PRE_PROD metrics
+  accuracy?: number;
+  precision?: number;
+  recall?: number;
+  f1?: number;
+  roc_auc?: number;
+  avg_precision?: number;
   // PRE_PROD artifacts
   confusion_matrix?: number[][];
   roc_curve_fpr?: number[];
   roc_curve_tpr?: number[];
   classification_report?: string;
+  // DATA_EVAL metrics
+  split?: string;
+  stage?: string;
+  n_rows?: number;
+  n_features?: number;
+  class_distribution?: Record<string, number>;
+  imbalance_ratio?: number;
+  duplicate_rows?: number;
+  missing_cells?: number;
   // DATA_EVAL artifacts
   features?: FeatureStats[];
   [key: string]: unknown;
@@ -48,9 +47,9 @@ export interface ReportRecord {
   report_id: string;
   timestamp: string;
   report_type: string;
+  model_id: string | null;
   model_version: string | null;
-  metrics: ReportMetrics | null;
-  artifacts: ReportArtifacts | null;
+  content: ReportContent | null;
 }
 
 export interface IncidentRecord {
