@@ -25,7 +25,7 @@ jobs:
           ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} bash -s <<EOF
           set -euo pipefail
           cd ~/vigilant-ui
-          git fetch --all --tags
+          git fetch --all --tags --force
           git checkout "$REF"
           docker compose build ui
           docker compose up -d
