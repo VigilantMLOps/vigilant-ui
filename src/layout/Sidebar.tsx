@@ -3,7 +3,7 @@ import { LayoutDashboard, BarChart3, Activity, Zap } from 'lucide-react';
 
 const navItems = [
   { to: '/', label: 'Overview', icon: LayoutDashboard, end: true },
-  { to: '/evaluation', label: 'Model Evaluation', icon: BarChart3, end: false },
+  { to: '/evaluation', label: 'Evaluation', icon: BarChart3, end: false },
   { to: '/feature-drift', label: 'Feature Drift', icon: Activity, end: false },
 ];
 

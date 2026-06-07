@@ -575,7 +575,7 @@ export default function Evaluation() {
     return (
       <div className="space-y-4">
         <div>
-          <h1 className="text-xl font-semibold text-gray-100">Model Evaluation</h1>
+          <h1 className="text-xl font-semibold text-gray-100">Evaluation</h1>
           <p className="text-sm text-gray-500 mt-0.5">Loading evaluation report…</p>
         </div>
         <LoadingSkeleton />
@@ -600,7 +600,7 @@ export default function Evaluation() {
       {/* Page header + tabs */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-xl font-semibold text-gray-100">Model Evaluation</h1>
+          <h1 className="text-xl font-semibold text-gray-100">Evaluation</h1>
           <p className="text-sm text-gray-500 mt-0.5">
             {tab === 'model' ? 'Pre-production metrics & curves' : 'Dataset profiling & feature statistics'}
           </p>
