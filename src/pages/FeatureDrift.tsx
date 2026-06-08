@@ -24,17 +24,17 @@ function PsiBar({ value }: { value: number }) {
   const color = value >= 0.2 ? '#f87171' : value >= 0.1 ? '#fbbf24' : '#34d399';
   return (
     <div className="flex items-center gap-2">
-      <div className="w-20 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+      <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden dark:bg-gray-800">
         <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
       </div>
-      <span className="font-mono text-xs text-gray-300 tabular-nums">{value.toFixed(4)}</span>
+      <span className="font-mono text-xs text-gray-700 tabular-nums dark:text-gray-300">{value.toFixed(4)}</span>
     </div>
   );
 }
 
 function SortIcon({ active, dir }: { active: boolean; dir: 'asc' | 'desc' }) {
-  if (!active) return <ArrowUpDown size={12} className="text-gray-600" />;
-  return dir === 'asc' ? <ArrowUp size={12} className="text-blue-400" /> : <ArrowDown size={12} className="text-blue-400" />;
+  if (!active) return <ArrowUpDown size={12} className="text-gray-400 dark:text-gray-600" />;
+  return dir === 'asc' ? <ArrowUp size={12} className="text-blue-500 dark:text-blue-400" /> : <ArrowDown size={12} className="text-blue-500 dark:text-blue-400" />;
 }
 
 export default function FeatureDrift() {
@@ -72,18 +72,18 @@ export default function FeatureDrift() {
   features.forEach((f) => counts[f.status]++);
 
   const headerCls =
-    'px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-300 transition-colors select-none';
+    'px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700 transition-colors select-none dark:hover:text-gray-300';
 
   if (isLoading) {
     return (
       <div className="space-y-4">
         <div>
-          <h1 className="text-xl font-semibold text-gray-100">Feature Drift</h1>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Feature Drift</h1>
           <p className="text-sm text-gray-500 mt-0.5">Running drift analysis against reference distribution…</p>
         </div>
         <div className="flex flex-col items-center justify-center py-24 gap-3">
           <Loader2 size={32} className="animate-spin text-blue-400" />
-          <p className="text-sm text-gray-400">Computing PSI statistics — this may take a few seconds</p>
+          <p className="text-sm text-gray-500">Computing PSI statistics — this may take a few seconds</p>
         </div>
       </div>
     );
@@ -92,14 +92,14 @@ export default function FeatureDrift() {
   if (error) {
     return (
       <div className="space-y-4">
-        <h1 className="text-xl font-semibold text-gray-100">Feature Drift</h1>
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Feature Drift</h1>
         <div className="flex flex-col items-center justify-center py-24 gap-3 text-center">
           <AlertCircle size={32} className="text-red-400" />
-          <p className="text-gray-300 font-medium">Drift analysis failed</p>
+          <p className="text-gray-700 font-medium dark:text-gray-300">Drift analysis failed</p>
           <p className="text-sm text-gray-500 max-w-sm">{(error as Error).message}</p>
           <button
             onClick={() => refetch()}
-            className="mt-2 flex items-center gap-2 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 hover:border-gray-500 transition-colors"
+            className="mt-2 flex items-center gap-2 px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-700 hover:border-gray-400 transition-colors dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-500"
           >
             <RefreshCw size={13} /> Retry
           </button>
@@ -112,11 +112,11 @@ export default function FeatureDrift() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-gray-100">Feature Drift</h1>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Feature Drift</h1>
           <p className="text-sm text-gray-500 mt-0.5">
             PSI &amp; statistical tests vs. reference distribution
             {drift && (
-              <span className="ml-2 text-xs text-gray-600">
+              <span className="ml-2 text-xs text-gray-400 dark:text-gray-600">
                 · {drift.n_accumulated.toLocaleString()} records · drift rate{' '}
                 {(drift.drift_rate * 100).toFixed(1)}%
               </span>
@@ -126,7 +126,7 @@ export default function FeatureDrift() {
         <button
           onClick={() => refetch()}
           disabled={isFetching}
-          className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-gray-400 transition-colors disabled:opacity-40"
+          className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-40 dark:text-gray-600 dark:hover:text-gray-400"
         >
           <RefreshCw size={11} className={isFetching ? 'animate-spin' : ''} /> refresh
         </button>
@@ -143,9 +143,9 @@ export default function FeatureDrift() {
               className={`text-left px-4 py-3 rounded-xl border transition-all ${
                 filter === s
                   ? s === 'all'
-                    ? 'bg-blue-600/15 border-blue-600/30 text-blue-400'
+                    ? 'bg-blue-600/15 border-blue-600/30 text-blue-600 dark:text-blue-400'
                     : `${sc!.bg} ${sc!.border} ${sc!.text}`
-                  : 'bg-gray-900 border-gray-800 text-gray-500 hover:border-gray-700 hover:text-gray-300'
+                  : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:bg-gray-900 dark:border-gray-800 dark:hover:border-gray-700 dark:hover:text-gray-300'
               }`}
             >
               <p className="text-lg font-bold">{counts[s]}</p>
@@ -173,23 +173,23 @@ export default function FeatureDrift() {
       {/* Search */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-xs">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
             placeholder="Search features…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-8 pr-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
+            className="w-full pl-8 pr-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:placeholder-gray-600"
           />
         </div>
-        <span className="text-xs text-gray-600">{filtered.length} of {features.length} features</span>
+        <span className="text-xs text-gray-400 dark:text-gray-600">{filtered.length} of {features.length} features</span>
       </div>
 
       {/* Table */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden dark:bg-gray-900 dark:border-gray-800">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="border-b border-gray-800">
+            <thead className="border-b border-gray-200 dark:border-gray-800">
               <tr>
                 <th className={headerCls} onClick={() => toggleSort('feature')}>
                   <span className="flex items-center gap-1.5">Feature <SortIcon active={sortKey === 'feature'} dir={sortDir} /></span>
@@ -207,22 +207,22 @@ export default function FeatureDrift() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800/60">
+            <tbody className="divide-y divide-gray-200/60 dark:divide-gray-800/60">
               {filtered.map((row: FeatureDriftResult) => {
                 const sc = statusConfig[row.status];
                 const type = methodType(row.method);
                 return (
-                  <tr key={row.feature} className="hover:bg-gray-800/30 transition-colors group">
+                  <tr key={row.feature} className="hover:bg-gray-50 transition-colors group dark:hover:bg-gray-800/30">
                     <td className="px-4 py-3">
-                      <span className="text-sm font-mono text-gray-200 group-hover:text-white transition-colors">
+                      <span className="text-sm font-mono text-gray-800 group-hover:text-gray-900 transition-colors dark:text-gray-200 dark:group-hover:text-white">
                         {row.feature}
                       </span>
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
                       <span className={`text-xs px-2 py-0.5 rounded border font-medium ${
                         type === 'numeric'
-                          ? 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20'
-                          : 'text-violet-400 bg-violet-500/10 border-violet-500/20'
+                          ? 'text-cyan-500 bg-cyan-500/10 border-cyan-500/20 dark:text-cyan-400'
+                          : 'text-violet-500 bg-violet-500/10 border-violet-500/20 dark:text-violet-400'
                       }`}>
                         {type}
                       </span>
@@ -232,15 +232,15 @@ export default function FeatureDrift() {
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
                       {row.pvalue != null ? (
-                        <span className={`font-mono text-xs tabular-nums ${row.pvalue < 0.05 ? 'text-red-400' : 'text-gray-400'}`}>
+                        <span className={`font-mono text-xs tabular-nums ${row.pvalue < 0.05 ? 'text-red-400' : 'text-gray-500'}`}>
                           {row.pvalue < 0.0001 ? '< 0.0001' : row.pvalue.toFixed(4)}
                         </span>
                       ) : (
-                        <span className="text-gray-600 text-xs">—</span>
+                        <span className="text-gray-400 text-xs dark:text-gray-600">—</span>
                       )}
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
-                      <span className="font-mono text-xs text-gray-600">{row.method}</span>
+                      <span className="font-mono text-xs text-gray-400 dark:text-gray-600">{row.method}</span>
                     </td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium ${sc.bg} ${sc.text} ${sc.border}`}>
@@ -254,16 +254,16 @@ export default function FeatureDrift() {
             </tbody>
           </table>
           {filtered.length === 0 && (
-            <div className="text-center py-12 text-gray-600 text-sm">No features match your filter.</div>
+            <div className="text-center py-12 text-gray-400 text-sm dark:text-gray-600">No features match your filter.</div>
           )}
         </div>
       </div>
 
-      <div className="flex items-center gap-6 text-xs text-gray-600">
+      <div className="flex items-center gap-6 text-xs text-gray-400 dark:text-gray-600">
         <span><span className="text-emerald-500 font-semibold">Green</span> = PSI &lt; 0.10 (stable)</span>
         <span><span className="text-amber-500 font-semibold">Yellow</span> = 0.10 ≤ PSI &lt; 0.20 (moderate drift)</span>
         <span><span className="text-red-500 font-semibold">Red</span> = PSI ≥ 0.20 (significant drift)</span>
-        <span className="text-gray-700">p-value &lt; 0.05 = statistically significant</span>
+        <span className="text-gray-300 dark:text-gray-700">p-value &lt; 0.05 = statistically significant</span>
       </div>
     </div>
   );

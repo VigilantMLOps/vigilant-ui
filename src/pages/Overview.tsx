@@ -14,9 +14,6 @@ const timeWindowMs: Record<string, number> = {
   'Last 30d': 30 * 24 * 60 * 60 * 1000,
 };
 
-// ISO timestamps from the backend can have microseconds (6 decimal places).
-// Standard JS Date only handles 3 (milliseconds), so we truncate before parsing.
-// Returns Infinity for null/unparseable so they always pass the >= cutoff check.
 function parseTs(iso: string | null | undefined): number {
   if (!iso) return Infinity;
   const ms = Date.parse(iso.replace(/(\.\d{3})\d+/, '$1'));
@@ -59,15 +56,15 @@ function LoadingRows() {
   return (
     <>
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-gray-800/60 animate-pulse">
-          <div className="w-7 h-7 rounded-lg bg-gray-800" />
+        <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-gray-200/60 animate-pulse dark:border-gray-800/60">
+          <div className="w-7 h-7 rounded-lg bg-gray-200 dark:bg-gray-800" />
           <div className="flex-1 space-y-2">
-            <div className="h-3 bg-gray-800 rounded w-32" />
-            <div className="h-2 bg-gray-800 rounded w-48" />
+            <div className="h-3 bg-gray-200 rounded w-32 dark:bg-gray-800" />
+            <div className="h-2 bg-gray-200 rounded w-48 dark:bg-gray-800" />
           </div>
           <div className="space-y-2 text-right">
-            <div className="h-3 bg-gray-800 rounded w-16" />
-            <div className="h-2 bg-gray-800 rounded w-12" />
+            <div className="h-3 bg-gray-200 rounded w-16 dark:bg-gray-800" />
+            <div className="h-2 bg-gray-200 rounded w-12 dark:bg-gray-800" />
           </div>
         </div>
       ))}
@@ -87,21 +84,21 @@ function IncidentDetail({ incident, onClose }: { incident: IncidentRecord; onClo
         className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="fixed right-0 top-0 h-full w-96 bg-gray-900 border-l border-gray-800 z-50 overflow-y-auto shadow-2xl flex flex-col">
+      <div className="fixed right-0 top-0 h-full w-96 bg-white border-l border-gray-200 z-50 overflow-y-auto shadow-2xl flex flex-col dark:bg-gray-900 dark:border-gray-800">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800 shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 shrink-0 dark:border-gray-800">
           <div className="flex items-center gap-3">
             <div className={`flex items-center justify-center w-8 h-8 rounded-lg border ${cfg.bg}`}>
               <Icon size={14} className={cfg.color} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-100">Incident Detail</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">Incident Detail</p>
               <p className={`text-xs font-medium ${cfg.color}`}>{incident.severity}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors"
+            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors dark:hover:text-gray-200 dark:hover:bg-gray-800"
           >
             <X size={15} />
           </button>
@@ -109,35 +106,32 @@ function IncidentDetail({ incident, onClose }: { incident: IncidentRecord; onClo
 
         {/* Body */}
         <div className="flex-1 p-5 space-y-5">
-          {/* Status + Type row */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-gray-800/60 rounded-xl p-3">
+            <div className="bg-gray-100/60 rounded-xl p-3 dark:bg-gray-800/60">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Status</p>
               <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${cfg.bg} ${cfg.color}`}>
                 {incident.status}
               </span>
             </div>
-            <div className="bg-gray-800/60 rounded-xl p-3">
+            <div className="bg-gray-100/60 rounded-xl p-3 dark:bg-gray-800/60">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Type</p>
-              <p className="text-sm font-mono text-gray-300">{incident.incident_type}</p>
+              <p className="text-sm font-mono text-gray-700 dark:text-gray-300">{incident.incident_type}</p>
             </div>
           </div>
 
-          {/* Timestamp */}
-          <div className="bg-gray-800/60 rounded-xl p-3">
+          <div className="bg-gray-100/60 rounded-xl p-3 dark:bg-gray-800/60">
             <div className="flex items-center gap-2 mb-1">
               <Calendar size={11} className="text-gray-500" />
               <p className="text-xs text-gray-500 uppercase tracking-wider">Timestamp</p>
             </div>
-            <p className="text-sm text-gray-300 font-mono">
+            <p className="text-sm text-gray-700 font-mono dark:text-gray-300">
               {new Date(incident.timestamp).toLocaleString()}
             </p>
-            <p className="text-xs text-gray-600 mt-0.5">{timeAgo(incident.timestamp)}</p>
+            <p className="text-xs text-gray-400 mt-0.5 dark:text-gray-600">{timeAgo(incident.timestamp)}</p>
           </div>
 
-          {/* PSI if present */}
           {psi != null && (
-            <div className="bg-gray-800/60 rounded-xl p-3">
+            <div className="bg-gray-100/60 rounded-xl p-3 dark:bg-gray-800/60">
               <div className="flex items-center gap-2 mb-1">
                 <Tag size={11} className="text-gray-500" />
                 <p className="text-xs text-gray-500 uppercase tracking-wider">PSI Score</p>
@@ -145,25 +139,23 @@ function IncidentDetail({ incident, onClose }: { incident: IncidentRecord; onClo
               <p className={`text-lg font-mono font-bold ${psi >= 0.2 ? 'text-red-400' : psi >= 0.1 ? 'text-amber-400' : 'text-emerald-400'}`}>
                 {psi.toFixed(4)}
               </p>
-              <p className="text-xs text-gray-600 mt-0.5">
+              <p className="text-xs text-gray-400 mt-0.5 dark:text-gray-600">
                 {psi >= 0.2 ? 'Significant drift' : psi >= 0.1 ? 'Moderate drift' : 'Stable'}
               </p>
             </div>
           )}
 
-          {/* Description */}
-          <div className="bg-gray-800/60 rounded-xl p-3">
+          <div className="bg-gray-100/60 rounded-xl p-3 dark:bg-gray-800/60">
             <div className="flex items-center gap-2 mb-2">
               <FileText size={11} className="text-gray-500" />
               <p className="text-xs text-gray-500 uppercase tracking-wider">Description</p>
             </div>
-            <p className="text-sm text-gray-300 leading-relaxed">
+            <p className="text-sm text-gray-700 leading-relaxed dark:text-gray-300">
               {incident.description ?? 'No description provided.'}
             </p>
           </div>
 
-          {/* Incident ID */}
-          <div className="bg-gray-800/60 rounded-xl p-3">
+          <div className="bg-gray-100/60 rounded-xl p-3 dark:bg-gray-800/60">
             <div className="flex items-center gap-2 mb-1">
               <Hash size={11} className="text-gray-500" />
               <p className="text-xs text-gray-500 uppercase tracking-wider">Incident ID</p>
@@ -192,16 +184,12 @@ export default function Overview() {
     isLoading: loadingReports,
   } = useQuery({ queryKey: ['reports'], queryFn: fetchReportHistory });
 
-  // Filter incidents by selected time window.
-  // windowMs is always defined since timeWindow is constrained to known keys,
-  // but fall back to 30 days so unknown values never produce -Infinity cutoff.
   const windowMs = timeWindowMs[timeWindow] ?? timeWindowMs['Last 30d'];
   const cutoff = Date.now() - windowMs;
   const visibleIncidents = (incidents ?? []).filter(
     (i) => parseTs(i.timestamp) >= cutoff
   );
 
-  // Show metrics for the selected model version, falling back to latest PRE_PROD
   const latestPreProd =
     reports?.find((r) => r.report_type === 'PRE_PROD' && r.model_version === modelVersion) ??
     reports?.find((r) => r.report_type === 'PRE_PROD');
@@ -220,15 +208,15 @@ export default function Overview() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-gray-100">System Overview</h1>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">System Overview</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Live monitoring — {modelVersion ? <span className="text-blue-400 font-mono">{modelVersion}</span> : 'all versions'}
-            <span className="ml-2 text-gray-600">· {timeWindow}</span>
+            Live monitoring — {modelVersion ? <span className="text-blue-500 font-mono dark:text-blue-400">{modelVersion}</span> : 'all versions'}
+            <span className="ml-2 text-gray-400 dark:text-gray-600">· {timeWindow}</span>
           </p>
         </div>
         <div className="flex items-center gap-4 text-sm">
           {loadingIncidents ? (
-            <Loader2 size={14} className="animate-spin text-gray-500" />
+            <Loader2 size={14} className="animate-spin text-gray-400 dark:text-gray-500" />
           ) : (
             <>
               <span className="flex items-center gap-1.5 text-red-400">
@@ -242,7 +230,6 @@ export default function Overview() {
         </div>
       </div>
 
-      {/* Summary stat cards */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
         <StatCard
           label="Model Accuracy"
@@ -270,10 +257,9 @@ export default function Overview() {
         />
       </div>
 
-      {/* Model metrics row */}
       {!loadingReports && metrics && (
         <div>
-          <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">Model Performance</h2>
+          <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Model Performance</h2>
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
             {[
               { label: 'Precision', value: metrics.precision },
@@ -281,31 +267,30 @@ export default function Overview() {
               { label: 'Avg Precision', value: metrics.avg_precision },
               { label: 'ROC-AUC', value: metrics.roc_auc },
             ].map(({ label, value }) => (
-              <div key={label} className="bg-gray-900 border border-gray-800 rounded-xl px-4 py-3">
+              <div key={label} className="bg-white border border-gray-200 rounded-xl px-4 py-3 dark:bg-gray-900 dark:border-gray-800">
                 <p className="text-xs text-gray-500 uppercase tracking-wider">{label}</p>
-                <p className="text-lg font-bold font-mono text-gray-100 mt-1">{fmtPct(value as number)}</p>
+                <p className="text-lg font-bold font-mono text-gray-900 mt-1 dark:text-gray-100">{fmtPct(value as number)}</p>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Incidents / drift alerts */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider">
+          <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider">
             Recent Incidents
-            <span className="ml-2 text-gray-600 normal-case font-normal">{visibleIncidents.length} in {timeWindow.toLowerCase()}</span>
+            <span className="ml-2 text-gray-400 normal-case font-normal dark:text-gray-600">{visibleIncidents.length} in {timeWindow.toLowerCase()}</span>
           </h2>
           <button
             onClick={() => refetchIncidents()}
-            className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-400 transition-colors"
+            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors dark:text-gray-600 dark:hover:text-gray-400"
           >
             <RefreshCw size={11} /> refresh
           </button>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden dark:bg-gray-900 dark:border-gray-800">
           {loadingIncidents ? (
             <LoadingRows />
           ) : incidentsError ? (
@@ -313,7 +298,7 @@ export default function Overview() {
               Failed to load incidents — {(incidentsError as Error).message}
             </div>
           ) : visibleIncidents.length === 0 ? (
-            <div className="px-5 py-8 text-center text-sm text-gray-600">
+            <div className="px-5 py-8 text-center text-sm text-gray-400 dark:text-gray-600">
               No incidents in {timeWindow.toLowerCase()}.
             </div>
           ) : (
@@ -327,21 +312,21 @@ export default function Overview() {
                   key={alert.incident_id}
                   onClick={() => setSelectedIncident(alert)}
                   className={`flex items-center gap-4 px-5 py-3.5 cursor-pointer ${
-                    idx !== Math.min(visibleIncidents.length, 10) - 1 ? 'border-b border-gray-800/60' : ''
-                  } hover:bg-gray-800/30 transition-colors`}
+                    idx !== Math.min(visibleIncidents.length, 10) - 1 ? 'border-b border-gray-200/60 dark:border-gray-800/60' : ''
+                  } hover:bg-gray-50 transition-colors dark:hover:bg-gray-800/30`}
                 >
                   <div className={`flex items-center justify-center w-7 h-7 rounded-lg border ${cfg.bg}`}>
                     <Icon size={13} className={cfg.color} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-200 font-mono">
+                      <span className="text-sm font-medium text-gray-800 font-mono dark:text-gray-200">
                         {extractFeature(alert.description)}
                       </span>
                       <span className={`text-xs px-1.5 py-0.5 rounded border ${cfg.bg} ${cfg.color} font-medium`}>
                         {alert.severity}
                       </span>
-                      <span className="text-xs text-gray-600 font-mono">{alert.incident_type}</span>
+                      <span className="text-xs text-gray-400 font-mono dark:text-gray-600">{alert.incident_type}</span>
                     </div>
                     <p className="text-xs text-gray-500 mt-0.5 truncate">
                       {alert.description ?? 'No description'}
@@ -349,9 +334,9 @@ export default function Overview() {
                   </div>
                   <div className="text-right shrink-0">
                     {psi != null && (
-                      <p className="text-sm font-mono text-gray-300">PSI {psi.toFixed(3)}</p>
+                      <p className="text-sm font-mono text-gray-700 dark:text-gray-300">PSI {psi.toFixed(3)}</p>
                     )}
-                    <p className="text-xs text-gray-600 flex items-center gap-1 justify-end mt-0.5">
+                    <p className="text-xs text-gray-400 flex items-center gap-1 justify-end mt-0.5 dark:text-gray-600">
                       <Clock size={10} /> {timeAgo(alert.timestamp)}
                     </p>
                   </div>
@@ -360,7 +345,7 @@ export default function Overview() {
             })
           )}
         </div>
-        <p className="text-xs text-gray-700 mt-2 text-right">Click any row for full details</p>
+        <p className="text-xs text-gray-400 mt-2 text-right dark:text-gray-700">Click any row for full details</p>
       </div>
     </div>
   );

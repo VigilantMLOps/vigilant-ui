@@ -1,5 +1,5 @@
 import apiClient from './client';
-import type { ReportRecord, IncidentRecord, DataDriftResult, ModelHealthResponse } from './types';
+import type { ReportRecord, IncidentRecord, DataDriftResult, ModelHealthResponse, RagTrace } from './types';
 import { SAMPLE_RECORDS } from './sampleRecords';
 
 export const fetchReportHistory = (): Promise<ReportRecord[]> =>
@@ -18,3 +18,6 @@ export const fetchModelHealth = (): Promise<ModelHealthResponse> =>
 
 export const fetchIncident = (id: string): Promise<IncidentRecord> =>
   apiClient.get<IncidentRecord>(`/api/v1/incidents/${id}`).then((r) => r.data);
+
+export const fetchRagTraces = (limit = 50): Promise<RagTrace[]> =>
+  apiClient.get<RagTrace[]>(`/api/v1/telemetry/rag-traces?limit=${limit}`).then((r) => r.data);

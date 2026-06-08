@@ -1,8 +1,9 @@
-import { ChevronDown, Bell, Clock, Cpu, XCircle, AlertTriangle, CheckCircle2, Activity } from 'lucide-react';
+import { ChevronDown, Bell, Clock, Cpu, XCircle, AlertTriangle, CheckCircle2, Activity, Sun, Moon } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchReportHistory, fetchIncidents } from '../api';
 import { useFilters, TIME_WINDOWS } from '../context/filters';
+import { useTheme } from '../context/ThemeContext';
 import type { IncidentRecord } from '../api/types';
 import type { TimeWindow } from '../context/filters';
 
@@ -25,21 +26,23 @@ function Dropdown({
     <div className="relative">
       <button
         onClick={() => setOpen((p) => !p)}
-        className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 hover:border-gray-600 hover:text-white transition-colors"
+        className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-700 hover:border-gray-400 hover:text-gray-900 transition-colors dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
       >
-        <Icon size={13} className="text-gray-500" />
-        <span className="text-gray-500 text-xs mr-0.5">{label}:</span>
+        <Icon size={13} className="text-gray-400 dark:text-gray-500" />
+        <span className="text-gray-400 text-xs mr-0.5 dark:text-gray-500">{label}:</span>
         <span className="max-w-[120px] truncate">{value}</span>
-        <ChevronDown size={13} className={`text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown size={13} className={`text-gray-400 transition-transform dark:text-gray-500 ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="absolute top-full mt-1.5 right-0 w-48 bg-gray-900 border border-gray-700 rounded-lg shadow-xl z-50 py-1 overflow-hidden">
+        <div className="absolute top-full mt-1.5 right-0 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-1 overflow-hidden dark:bg-gray-900 dark:border-gray-700">
           {options.map((opt) => (
             <button
               key={opt}
               onClick={() => { onChange(opt); setOpen(false); }}
               className={`w-full text-left px-3 py-2 text-sm transition-colors truncate ${
-                opt === value ? 'text-blue-400 bg-blue-600/10' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                opt === value
+                  ? 'text-blue-600 bg-blue-600/10 dark:text-blue-400'
+                  : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'
               }`}
             >
               {opt}
@@ -67,6 +70,7 @@ const severityIcon: Record<string, { Icon: React.ElementType; color: string; bg:
 
 export default function Header() {
   const { timeWindow, setTimeWindow, modelVersion, setModelVersion } = useFilters();
+  const { theme, toggleTheme } = useTheme();
 
   const { data: reports } = useQuery({
     queryKey: ['reports'],
@@ -116,9 +120,9 @@ export default function Header() {
   const badgeCount = alerts.length;
 
   return (
-    <header className="fixed top-0 left-60 right-0 h-14 bg-gray-950/90 backdrop-blur-sm border-b border-gray-800 flex items-center justify-between px-6 z-10">
+    <header className="fixed top-0 left-60 right-0 h-14 bg-white/90 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-6 z-10 dark:bg-gray-950/90 dark:border-gray-800">
       <div className="flex items-center gap-1.5">
-        <span className="text-xs font-medium text-gray-600 uppercase tracking-widest">Filters</span>
+        <span className="text-xs font-medium text-gray-400 uppercase tracking-widest dark:text-gray-600">Filters</span>
       </div>
       <div className="flex items-center gap-3">
         <Dropdown
@@ -138,14 +142,23 @@ export default function Header() {
 
         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
           <Activity size={11} className="text-emerald-400" />
-          <span className="text-xs text-emerald-400 font-medium">Model Healthy</span>
+          <span className="text-xs text-emerald-500 font-medium dark:text-emerald-400">Model Healthy</span>
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
         </div>
+
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors dark:text-gray-500 dark:hover:text-gray-200 dark:hover:bg-gray-800"
+        >
+          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
 
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setNotifOpen((p) => !p)}
-            className="relative p-2 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors"
+            className="relative p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors dark:text-gray-500 dark:hover:text-gray-200 dark:hover:bg-gray-800"
           >
             <Bell size={16} />
             {badgeCount > 0 && (
@@ -156,14 +169,14 @@ export default function Header() {
           </button>
 
           {notifOpen && (
-            <div className="absolute top-full mt-2 right-0 w-80 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
-                <span className="text-sm font-medium text-gray-200">Alerts</span>
+            <div className="absolute top-full mt-2 right-0 w-80 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 overflow-hidden dark:bg-gray-900 dark:border-gray-700">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800">
+                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">Alerts</span>
                 <span className="text-xs text-gray-500">{badgeCount} active</span>
               </div>
-              <div className="max-h-80 overflow-y-auto divide-y divide-gray-800/60">
+              <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-800/60">
                 {badgeCount === 0 ? (
-                  <div className="px-4 py-8 text-center text-sm text-gray-600">No active alerts</div>
+                  <div className="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-600">No active alerts</div>
                 ) : (
                   alerts.slice(0, 20).map((alert: IncidentRecord) => {
                     const cfg = severityIcon[alert.severity] ?? severityIcon.INFO;
@@ -171,7 +184,7 @@ export default function Header() {
                     return (
                       <div
                         key={alert.incident_id}
-                        className="flex items-start gap-3 px-4 py-3 hover:bg-gray-800/30 transition-colors"
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors dark:hover:bg-gray-800/30"
                       >
                         <div className={`mt-0.5 p-1 rounded-md ${cfg.bg} shrink-0`}>
                           <Icon size={12} className={cfg.color} />
@@ -181,12 +194,12 @@ export default function Header() {
                             <span className={`text-[10px] font-semibold uppercase tracking-wide ${cfg.color}`}>
                               {alert.severity}
                             </span>
-                            <span className="text-[10px] text-gray-600">{alert.incident_type}</span>
+                            <span className="text-[10px] text-gray-400 dark:text-gray-600">{alert.incident_type}</span>
                           </div>
-                          <p className="text-xs text-gray-300 leading-relaxed line-clamp-2">
+                          <p className="text-xs text-gray-700 leading-relaxed line-clamp-2 dark:text-gray-300">
                             {alert.description ?? 'No description'}
                           </p>
-                          <p className="text-[10px] text-gray-600 mt-1">{timeAgo(alert.timestamp)}</p>
+                          <p className="text-[10px] text-gray-400 mt-1 dark:text-gray-600">{timeAgo(alert.timestamp)}</p>
                         </div>
                       </div>
                     );
@@ -194,7 +207,7 @@ export default function Header() {
                 )}
               </div>
               {badgeCount > 20 && (
-                <div className="px-4 py-2 border-t border-gray-800 text-center text-xs text-gray-600">
+                <div className="px-4 py-2 border-t border-gray-200 text-center text-xs text-gray-400 dark:border-gray-800 dark:text-gray-600">
                   +{badgeCount - 20} more — see Overview for full list
                 </div>
               )}

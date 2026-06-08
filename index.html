@@ -9,6 +9,12 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://bolt.new/static/og_default.png" />
     <script src="/env.js"></script>
+    <script>
+      (function() {
+        var t = localStorage.getItem('vigilant-theme');
+        if (t !== 'light') document.documentElement.classList.add('dark');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

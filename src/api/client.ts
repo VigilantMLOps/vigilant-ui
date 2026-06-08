@@ -7,7 +7,11 @@ declare global {
 }
 
 const apiClient = axios.create({
-  baseURL: window.__env__?.API_URL ?? import.meta.env.VITE_API_URL ?? 'https://vigilant-api.duckdns.org',
+  // In dev, use an empty baseURL so all /api/* requests go through Vite's proxy to localhost:8000.
+  // In production, fall back to the configured API URL.
+  baseURL: import.meta.env.DEV
+    ? ''
+    : (window.__env__?.API_URL ?? import.meta.env.VITE_API_URL ?? 'https://vigilant-api.duckdns.org'),
   headers: { 'Content-Type': 'application/json' },
   timeout: 60000,
 });
