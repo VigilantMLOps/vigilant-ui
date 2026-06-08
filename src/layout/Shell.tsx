@@ -4,7 +4,7 @@ import Header from './Header';
 
 export default function Shell() {
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100">
+    <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
       <Sidebar />
       <Header />
       <main className="ml-60 pt-14 min-h-screen">

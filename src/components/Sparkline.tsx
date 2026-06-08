@@ -1,4 +1,5 @@
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
+import { useChartTheme } from '../context/ThemeContext';
 
 interface SparklineProps {
   data: { time: string; value: number }[];
@@ -17,13 +18,14 @@ const statusColors = {
 
 export default function Sparkline({ data, label, currentValue, unit = '', status = 'healthy' }: SparklineProps) {
   const colors = statusColors[status];
+  const { tooltipStyle } = useChartTheme();
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors">
+    <div className="bg-white border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition-colors dark:bg-gray-900 dark:border-gray-800 dark:hover:border-gray-700">
       <div className="flex items-start justify-between mb-4">
         <div>
           <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">{label}</p>
-          <p className="text-xl font-bold text-gray-100 mt-1">
+          <p className="text-xl font-bold text-gray-900 mt-1 dark:text-gray-100">
             {currentValue}<span className="text-sm font-normal text-gray-500 ml-1">{unit}</span>
           </p>
         </div>
@@ -43,13 +45,7 @@ export default function Sparkline({ data, label, currentValue, unit = '', status
             </defs>
             <XAxis dataKey="time" hide />
             <Tooltip
-              contentStyle={{
-                backgroundColor: '#111827',
-                border: '1px solid #374151',
-                borderRadius: '8px',
-                fontSize: '11px',
-                color: '#e5e7eb',
-              }}
+              contentStyle={tooltipStyle}
               formatter={(v) => [`${v}${unit}`, label]}
             />
             <Area

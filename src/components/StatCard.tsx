@@ -19,7 +19,7 @@ export default function StatCard({ label, value, delta, deltaLabel, status = 'he
   const deltaColor = delta === undefined ? 'text-gray-500' : delta > 0 ? 'text-emerald-400' : 'text-red-400';
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors">
+    <div className="bg-white border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition-colors dark:bg-gray-900 dark:border-gray-800 dark:hover:border-gray-700">
       <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-3">{label}</p>
       <p className={`text-2xl font-bold ${statusColors[status]}`}>{value}</p>
       {(delta !== undefined || deltaLabel) && (

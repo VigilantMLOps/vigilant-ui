@@ -86,3 +86,19 @@ export interface ModelHealthResponse {
   status_code: number | null;
   error: string | null;
 }
+
+export interface RagTrace {
+  trace_id: string;
+  timestamp: string;
+  query_text: string;
+  query_mode: string;
+  n_retrieved: number;
+  top_retrieval_score: number;
+  total_tokens: number;
+  latency_ms: number;
+  retrieval_latency_ms: number;
+  generation_latency_ms: number;
+  model_id: string;
+  sources: string[];
+  prompt_version: string;
+}
