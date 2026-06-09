@@ -2,6 +2,22 @@
 
 The frontend dashboard for [vigilant-api](https://github.com/VigilantMLOps/vigilant-api) — a dashboard for ML model evaluations, incidents, and feature drift.
 
+Live here: https://vigilant-ui.duckdns.org/
+
+</br>
+
+<img width="1512" height="843" alt="Screenshot 2026-06-09 at 12 18 00 PM" src="https://github.com/user-attachments/assets/f20410fa-95bd-4d3e-ac83-2f5ffe1d188b" />
+
+</br>
+
+<img width="1512" height="843" alt="Screenshot 2026-06-09 at 12 17 19 PM" src="https://github.com/user-attachments/assets/e1e721bb-6c7a-4fc0-8ac5-2db59daa21cf" />
+
+</br>
+
+<img width="1512" height="837" alt="Screenshot 2026-06-09 at 12 18 50 PM" src="https://github.com/user-attachments/assets/c95f3dcf-71fb-45bf-b398-a6f6156b9c97" />
+
+
+
 ## Tech Stack
 
 - **React 18** + **TypeScript**
