@@ -1,10 +1,11 @@
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, BarChart3, Activity, Zap, BrainCircuit } from 'lucide-react';
+import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, BarChart3, Activity, Zap, BrainCircuit, ShieldAlert, Home } from 'lucide-react';
 
 const mlopsNav = [
-  { to: '/', label: 'Overview', icon: LayoutDashboard, end: true },
+  { to: '/mlops', label: 'Overview', icon: LayoutDashboard, end: true },
   { to: '/evaluation', label: 'Evaluation', icon: BarChart3, end: false },
   { to: '/feature-drift', label: 'Feature Drift', icon: Activity, end: false },
+  { to: '/model-serving', label: 'Model Serving', icon: ShieldAlert, end: false },
 ];
 
 const llmopsNav = [
@@ -20,21 +21,21 @@ export default function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 h-full w-60 bg-white border-r border-gray-200 flex flex-col z-20 dark:bg-gray-950 dark:border-gray-800">
       {/* Brand */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-gray-200 dark:border-gray-800">
+      <Link to="/" className="flex items-center gap-2.5 px-5 py-5 border-b border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/60 transition-colors">
         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600">
           <Zap size={16} className="text-white" strokeWidth={2.5} />
         </div>
         <div>
-          <p className="text-gray-900 font-semibold text-sm leading-tight dark:text-white">Vigilant</p>
+          <p className="text-gray-900 font-semibold text-sm leading-tight dark:text-white">Atlas AI</p>
           <p className="text-gray-500 text-xs">Observability Platform</p>
         </div>
-      </div>
+      </Link>
 
       {/* Mode switcher */}
       <div className="px-3 pt-3 pb-2">
         <div className="flex gap-1 p-1 bg-gray-100 rounded-lg border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/mlops')}
             className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${
               !isLLMOps
                 ? 'bg-blue-600 text-white shadow-sm'
@@ -90,6 +91,17 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      {/* Footer: back to home + status */}
+      <div className="px-3 pb-2">
+        <NavLink
+          to="/"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 border border-transparent transition-all dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-gray-800/60"
+        >
+          <Home size={14} className="text-gray-400" strokeWidth={2} />
+          All Products
+        </NavLink>
+      </div>
 
       <div className="px-5 py-4 border-t border-gray-200 dark:border-gray-800">
         <div className="flex items-center gap-2">

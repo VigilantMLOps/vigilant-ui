@@ -1,3 +1,38 @@
+export interface FlowRecord {
+  flow_duration: number;
+  bytes_total: number;
+  pkts_total: number;
+  rate: number;
+  srate: number;
+  drate: number;
+  min: number;
+  max: number;
+  avg: number;
+  std: number;
+  proto: string;
+  state: string;
+  source: string;
+}
+
+export interface LoginRecord {
+  user_id: string;
+  ip_address: string;
+  geo_country: string;
+  geo_lat: number;
+  geo_lon: number;
+  user_agent: string;
+  device_fingerprint: string;
+  login_success: boolean;
+  mfa_used: boolean;
+  mfa_method: string;
+  login_duration_ms: number;
+  account_age_days: number;
+  failed_attempts_7d: number;
+  distinct_ips_7d: number;
+  login_success_rate_30d: number;
+  avg_login_hour_7d: number;
+}
+
 export interface FeatureStats {
   name: string;
   dtype: string;
@@ -59,6 +94,7 @@ export interface IncidentRecord {
   incident_type: string;
   description: string | null;
   status: string;
+  model_id: string | null;
 }
 
 export type DriftStatus = 'ok' | 'warning' | 'critical';
@@ -85,6 +121,7 @@ export interface ModelHealthResponse {
   url: string;
   status_code: number | null;
   error: string | null;
+  serving_model_version: string | null;
 }
 
 export interface RagTrace {

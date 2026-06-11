@@ -1,7 +1,8 @@
-import { ChevronDown, Bell, Clock, Cpu, XCircle, AlertTriangle, CheckCircle2, Activity, Sun, Moon } from 'lucide-react';
+import { ChevronDown, Bell, Clock, Cpu, XCircle, AlertTriangle, CheckCircle2, Activity, Sun, Moon, Wifi, WifiOff } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { fetchReportHistory, fetchIncidents } from '../api';
+import { fetchModelVersions, fetchIncidents, fetchModelHealth, type ModelVersionEntry } from '../api';
 import { useFilters, TIME_WINDOWS } from '../context/filters';
 import { useTheme } from '../context/ThemeContext';
 import type { IncidentRecord } from '../api/types';
@@ -11,16 +12,19 @@ function Dropdown({
   icon: Icon,
   label,
   options,
+  optionLabels = {},
   value,
   onChange,
 }: {
   icon: React.ElementType;
   label: string;
   options: string[];
+  optionLabels?: Record<string, string>;
   value: string;
   onChange: (v: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const displayValue = optionLabels[value] ?? value;
 
   return (
     <div className="relative">
@@ -30,11 +34,11 @@ function Dropdown({
       >
         <Icon size={13} className="text-gray-400 dark:text-gray-500" />
         <span className="text-gray-400 text-xs mr-0.5 dark:text-gray-500">{label}:</span>
-        <span className="max-w-[120px] truncate">{value}</span>
+        <span className="max-w-[140px] truncate">{displayValue}</span>
         <ChevronDown size={13} className={`text-gray-400 transition-transform dark:text-gray-500 ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="absolute top-full mt-1.5 right-0 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-1 overflow-hidden dark:bg-gray-900 dark:border-gray-700">
+        <div className="absolute top-full mt-1.5 right-0 w-52 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-1 overflow-hidden dark:bg-gray-900 dark:border-gray-700">
           {options.map((opt) => (
             <button
               key={opt}
@@ -45,7 +49,7 @@ function Dropdown({
                   : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'
               }`}
             >
-              {opt}
+              {optionLabels[opt] ?? opt}
             </button>
           ))}
         </div>
@@ -71,27 +75,36 @@ const severityIcon: Record<string, { Icon: React.ElementType; color: string; bg:
 export default function Header() {
   const { timeWindow, setTimeWindow, modelVersion, setModelVersion } = useFilters();
   const { theme, toggleTheme } = useTheme();
+  const { pathname } = useLocation();
+  const isLLMOps = pathname.startsWith('/llm-ops');
 
-  const { data: reports } = useQuery({
-    queryKey: ['reports'],
-    queryFn: fetchReportHistory,
+  const { data: modelEntries = [] } = useQuery<ModelVersionEntry[]>({
+    queryKey: ['model-versions'],
+    queryFn: fetchModelVersions,
     staleTime: 5 * 60_000,
+    enabled: !isLLMOps,
   });
+  const versions = modelEntries.map((e) => e.version);
+  const versionLabel = Object.fromEntries(modelEntries.map((e) => [e.version, e.label]));
+
+  const { data: modelHealth } = useQuery({
+    queryKey: ['model-health'],
+    queryFn: fetchModelHealth,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+    enabled: !isLLMOps,
+  });
+  const serviceUp = modelHealth?.status_code === 200;
+  const servingVersion = modelHealth?.serving_model_version ?? null;
+  // Healthy only when the service is up AND it's serving the currently selected model
+  const isHealthy = serviceUp && (servingVersion === null || servingVersion === modelVersion);
 
   const { data: incidents } = useQuery({
-    queryKey: ['incidents'],
-    queryFn: fetchIncidents,
+    queryKey: ['incidents', modelVersion],
+    queryFn: () => fetchIncidents(modelVersion || undefined),
     staleTime: 60_000,
+    enabled: !isLLMOps,
   });
-
-  const versions = [
-    ...new Set(
-      (reports ?? [])
-        .filter((r) => r.report_type === 'PRE_PROD')
-        .map((r) => r.model_version)
-        .filter((v): v is string => v != null)
-    ),
-  ];
 
   const versionsKey = versions.join(',');
   useEffect(() => {
@@ -132,19 +145,42 @@ export default function Header() {
           value={timeWindow}
           onChange={(v) => setTimeWindow(v as TimeWindow)}
         />
-        <Dropdown
-          icon={Cpu}
-          label="Model"
-          options={versions.length > 0 ? versions : ['loading…']}
-          value={versions.includes(modelVersion) ? modelVersion : (versions[0] ?? 'loading…')}
-          onChange={setModelVersion}
-        />
+        {isLLMOps ? (
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 border border-gray-300 rounded-lg text-sm dark:bg-gray-800 dark:border-gray-700">
+            <Cpu size={13} className="text-gray-400 dark:text-gray-500" />
+            <span className="text-gray-400 text-xs mr-0.5 dark:text-gray-500">System:</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">Atlas RAG</span>
+          </div>
+        ) : (
+          <Dropdown
+            icon={Cpu}
+            label="Model"
+            options={versions.length > 0 ? versions : ['loading…']}
+            optionLabels={versionLabel}
+            value={versions.includes(modelVersion) ? modelVersion : (versions[0] ?? 'loading…')}
+            onChange={setModelVersion}
+          />
+        )}
 
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-          <Activity size={11} className="text-emerald-400" />
-          <span className="text-xs text-emerald-500 font-medium dark:text-emerald-400">Model Healthy</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-        </div>
+        {isLLMOps ? (
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-100 border border-gray-200 dark:bg-gray-800/60 dark:border-gray-700">
+            <Activity size={11} className="text-gray-400 dark:text-gray-500" />
+            <span className="text-xs text-gray-500 font-medium dark:text-gray-400">Atlas RAG · Local</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
+          </div>
+        ) : modelHealth === undefined ? null : isHealthy ? (
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+            <Wifi size={11} className="text-emerald-400" />
+            <span className="text-xs text-emerald-500 font-medium dark:text-emerald-400">Model Healthy</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-100 border border-gray-200 dark:bg-gray-800/60 dark:border-gray-700">
+            <WifiOff size={11} className="text-gray-400 dark:text-gray-500" />
+            <span className="text-xs text-gray-500 font-medium dark:text-gray-400">Service Offline</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
+          </div>
+        )}
 
         {/* Theme toggle */}
         <button

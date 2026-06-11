@@ -362,8 +362,15 @@ function DataEvalSummaryCard({ label, value, sub }: { label: string; value: stri
   );
 }
 
-function DataTab({ reports }: { reports: ReportRecord[] }) {
-  const dataReports = reports.filter((r) => r.report_type === 'DATA_EVAL');
+function DataTab({ reports, modelVersion }: { reports: ReportRecord[]; modelVersion: string }) {
+  // Resolve the model_id for the selected version from its PRE_PROD report, then
+  // filter DATA_EVAL reports to only those belonging to the same model.
+  const modelId = reports.find(
+    (r) => r.report_type === 'PRE_PROD' && r.model_version === modelVersion
+  )?.model_id ?? null;
+  const dataReports = reports.filter(
+    (r) => r.report_type === 'DATA_EVAL' && (modelId ? r.model_id === modelId : true)
+  );
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [featureSearch, setFeatureSearch] = useState('');
 
@@ -623,7 +630,7 @@ export default function Evaluation() {
 
       {tab === 'model'
         ? <ModelTab reports={allReports} modelVersion={modelVersion} />
-        : <DataTab reports={allReports} />
+        : <DataTab reports={allReports} modelVersion={modelVersion} />
       }
     </div>
   );
