@@ -6,8 +6,23 @@ import {
 import { AlertCircle, Loader2, RefreshCw, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Search, X, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { fetchRagTraces } from '../api';
 import type { RagTrace } from '../api/types';
+import { useFilters, TIME_WINDOWS } from '../context/filters';
 import StatCard from '../components/StatCard';
 import { useChartTheme } from '../context/ThemeContext';
+
+const TIME_WINDOW_MS: Record<string, number> = {
+  'Last 1h':  1 * 60 * 60 * 1000,
+  'Last 6h':  6 * 60 * 60 * 1000,
+  'Last 24h': 24 * 60 * 60 * 1000,
+  'Last 7d':  7 * 24 * 60 * 60 * 1000,
+  'Last 30d': 30 * 24 * 60 * 60 * 1000,
+};
+
+function toSince(timeWindow: string): string | undefined {
+  const ms = TIME_WINDOW_MS[timeWindow];
+  if (!ms) return undefined;
+  return new Date(Date.now() - ms).toISOString();
+}
 
 const modeColors: Record<string, { bg: string; text: string; border: string }> = {
   factual:   { bg: 'bg-blue-500/10',   text: 'text-blue-500',   border: 'border-blue-500/20' },
@@ -54,6 +69,7 @@ export default function LLMOps() {
   const [sortKey, setSortKey] = useState<SortKey>('timestamp');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
+  const { timeWindow } = useFilters();
   const { gridColor, axisColor, legendColor, tooltipStyle } = useChartTheme();
 
   const toggleSort = (key: SortKey) => {
@@ -64,8 +80,8 @@ export default function LLMOps() {
   };
 
   const { data: traces, isLoading, error, refetch, isFetching } = useQuery({
-    queryKey: ['rag-traces'],
-    queryFn: () => fetchRagTraces(50),
+    queryKey: ['rag-traces', timeWindow],
+    queryFn: () => fetchRagTraces(200, toSince(timeWindow)),
     staleTime: 30_000,
   });
 
@@ -140,7 +156,7 @@ export default function LLMOps() {
         <div>
           <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">LLM Operations</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Observability for vigilant-rag
+            Observability for atlas-rag
             {totalQueries > 0 && (
               <span className="ml-2 text-xs text-gray-400 dark:text-gray-600">· last {totalQueries} queries</span>
             )}
@@ -261,7 +277,7 @@ export default function LLMOps() {
 
         {rows.length === 0 ? (
           <div className="text-center py-16 text-sm text-gray-400 dark:text-gray-600">
-            No traces yet — run a query in vigilant-rag to see data here.
+            No traces yet — run a query in atlas-rag to see data here.
           </div>
         ) : filteredRows.length === 0 ? (
           <div className="text-center py-12 text-sm text-gray-400 dark:text-gray-600">
@@ -347,11 +363,11 @@ export default function LLMOps() {
                           <span className="ml-2 text-gray-700 tabular-nums dark:text-gray-300">{trace.generation_latency_ms}ms</span>
                         </div>
                         <div>
-                          <span className="text-gray-400 dark:text-gray-600">Retrieved</span>
-                          <span className="ml-2 text-gray-700 tabular-nums dark:text-gray-300">{trace.n_retrieved} chunks</span>
+                          <span className="text-gray-400 dark:text-gray-600">Chunks</span>
+                          <span className="ml-2 text-gray-700 tabular-nums dark:text-gray-300">{trace.n_retrieved} retrieved</span>
                         </div>
                         <div>
-                          <span className="text-gray-400 dark:text-gray-600">Model</span>
+                          <span className="text-gray-400 dark:text-gray-600">LLM</span>
                           <span className="ml-2 text-gray-700 font-mono dark:text-gray-300">{trace.model_id}</span>
                         </div>
                       </div>

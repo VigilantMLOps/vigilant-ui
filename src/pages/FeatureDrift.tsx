@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, ArrowUpDown, ArrowUp, ArrowDown, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
+import { Search, ArrowUpDown, ArrowUp, ArrowDown, AlertCircle, Loader2, RefreshCw, Activity } from 'lucide-react';
 import { fetchDrift } from '../api';
+import { useFilters } from '../context/filters';
 import type { FeatureDriftResult, DriftStatus } from '../api/types';
 
 type SortKey = 'feature' | 'statistic' | 'pvalue' | 'status';
@@ -43,10 +44,15 @@ export default function FeatureDrift() {
   const [sortKey, setSortKey] = useState<SortKey>('statistic');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
+  const { modelVersion } = useFilters();
+
+  const isAtoModel = modelVersion.startsWith('model_');
+
   const { data: drift, isLoading, error, refetch, isFetching } = useQuery({
-    queryKey: ['drift'],
-    queryFn: fetchDrift,
+    queryKey: ['drift', modelVersion],
+    queryFn: () => fetchDrift(modelVersion || undefined),
     staleTime: 5 * 60_000,
+    enabled: !isAtoModel,
   });
 
   const toggleSort = (key: SortKey) => {
@@ -74,12 +80,41 @@ export default function FeatureDrift() {
   const headerCls =
     'px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700 transition-colors select-none dark:hover:text-gray-300';
 
+  if (isAtoModel) {
+    return (
+      <div className="space-y-4">
+        <div>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Feature Drift</h1>
+          <p className="text-sm text-gray-500 mt-0.5">
+            PSI &amp; statistical tests vs. reference distribution
+            <span className="ml-2 text-xs text-gray-400 dark:text-gray-600">· {modelVersion}</span>
+          </p>
+        </div>
+        <div className="flex flex-col items-center justify-center py-24 gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+            <Activity size={24} className="text-gray-400 dark:text-gray-600" />
+          </div>
+          <div className="text-center">
+            <p className="text-gray-700 font-medium dark:text-gray-300">Drift monitoring not configured</p>
+            <p className="text-sm text-gray-400 dark:text-gray-600 mt-1 max-w-sm">
+              Feature drift for the ATO Detector requires an ATO-specific reference baseline.
+              Push a reference distribution snapshot to enable this view.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="space-y-4">
         <div>
           <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Feature Drift</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Running drift analysis against reference distribution…</p>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Running drift analysis against reference distribution…
+            {modelVersion && <span className="ml-2 text-xs text-gray-400 dark:text-gray-600">· {modelVersion}</span>}
+          </p>
         </div>
         <div className="flex flex-col items-center justify-center py-24 gap-3">
           <Loader2 size={32} className="animate-spin text-blue-400" />
@@ -115,6 +150,9 @@ export default function FeatureDrift() {
           <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Feature Drift</h1>
           <p className="text-sm text-gray-500 mt-0.5">
             PSI &amp; statistical tests vs. reference distribution
+            {modelVersion && (
+              <span className="ml-2 text-xs text-gray-400 dark:text-gray-600">· {modelVersion}</span>
+            )}
             {drift && (
               <span className="ml-2 text-xs text-gray-400 dark:text-gray-600">
                 · {drift.n_accumulated.toLocaleString()} records · drift rate{' '}

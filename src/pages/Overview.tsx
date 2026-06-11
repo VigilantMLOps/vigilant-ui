@@ -177,7 +177,10 @@ export default function Overview() {
     isLoading: loadingIncidents,
     error: incidentsError,
     refetch: refetchIncidents,
-  } = useQuery({ queryKey: ['incidents'], queryFn: fetchIncidents });
+  } = useQuery({
+    queryKey: ['incidents', modelVersion],
+    queryFn: () => fetchIncidents(modelVersion || undefined),
+  });
 
   const {
     data: reports,

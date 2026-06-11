@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 
-export const TIME_WINDOWS = ['Last 1h', 'Last 6h', 'Last 24h', 'Last 7d', 'Last 30d'] as const;
+export const TIME_WINDOWS = ['Last 1h', 'Last 6h', 'Last 24h', 'Last 7d', 'Last 30d', 'All Time'] as const;
 export type TimeWindow = typeof TIME_WINDOWS[number];
 
 export interface FiltersCtx {
