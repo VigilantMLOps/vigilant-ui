@@ -418,22 +418,17 @@ function DataTab({ reports, modelVersion }: { reports: ReportRecord[]; modelVers
       {/* Report selector */}
       <div>
         <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Select Dataset Report</p>
-        <div className="flex flex-wrap gap-2">
+        <select
+          value={selected.report_id}
+          onChange={(e) => { setSelectedId(e.target.value); setFeatureSearch(''); }}
+          className="w-full sm:w-72 px-3 py-2 rounded-lg text-xs font-mono border bg-white text-gray-700 border-gray-200 focus:outline-none focus:border-blue-500 transition-colors dark:bg-gray-900 dark:text-gray-300 dark:border-gray-800"
+        >
           {dataReports.map((r) => (
-            <button
-              key={r.report_id}
-              onClick={() => { setSelectedId(r.report_id); setFeatureSearch(''); }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                r.report_id === selected.report_id
-                  ? 'bg-blue-600/20 border-blue-600/30 text-blue-600 dark:text-blue-400'
-                  : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:bg-gray-900 dark:border-gray-800 dark:hover:border-gray-600 dark:hover:text-gray-300'
-              }`}
-            >
-              {r.report_id === selected.report_id && <ChevronRight size={10} />}
-              <span className="font-mono">{r.model_version ?? 'unknown'}</span>
-            </button>
+            <option key={r.report_id} value={r.report_id}>
+              {r.model_version ?? 'unknown'}
+            </option>
           ))}
-        </div>
+        </select>
       </div>
 
       {/* Summary cards */}
