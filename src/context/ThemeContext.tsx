@@ -11,7 +11,7 @@ const ThemeContext = createContext<ThemeCtx>({ theme: 'dark', toggleTheme: () =>
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('vigilant-theme');
+    const saved = localStorage.getItem('atlas-theme');
     return saved === 'light' ? 'light' : 'dark';
   });
 
@@ -19,7 +19,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const root = document.documentElement;
     if (theme === 'dark') root.classList.add('dark');
     else root.classList.remove('dark');
-    localStorage.setItem('vigilant-theme', theme);
+    localStorage.setItem('atlas-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
