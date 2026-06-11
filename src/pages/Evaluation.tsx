@@ -368,8 +368,14 @@ function DataTab({ reports, modelVersion }: { reports: ReportRecord[]; modelVers
   const modelId = reports.find(
     (r) => r.report_type === 'PRE_PROD' && r.model_version === modelVersion
   )?.model_id ?? null;
-  const dataReports = reports.filter(
-    (r) => r.report_type === 'DATA_EVAL' && (modelId ? r.model_id === modelId : true)
+  const dataReports = Object.values(
+    reports
+      .filter((r) => r.report_type === 'DATA_EVAL' && (modelId ? r.model_id === modelId : true))
+      .reduce((acc, r) => {
+        const key = r.model_version ?? r.report_id;
+        if (!acc[key] || new Date(r.timestamp) > new Date(acc[key].timestamp)) acc[key] = r;
+        return acc;
+      }, {} as Record<string, ReportRecord>)
   );
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [featureSearch, setFeatureSearch] = useState('');
