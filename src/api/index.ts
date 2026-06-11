@@ -1,5 +1,5 @@
 import apiClient from './client';
-import type { ReportRecord, IncidentRecord, DataDriftResult, ModelHealthResponse, RagTrace, FlowRecord } from './types';
+import type { ReportRecord, IncidentRecord, DataDriftResult, ModelHealthResponse, RagTrace } from './types';
 
 export const fetchReportHistory = (): Promise<ReportRecord[]> =>
   apiClient.get<ReportRecord[]>('/api/v1/reports/history').then((r) => r.data);
@@ -14,13 +14,12 @@ export const fetchIncidents = (modelVersion?: string): Promise<IncidentRecord[]>
     .get<IncidentRecord[]>('/api/v1/incidents', { params: modelVersion ? { model_version: modelVersion } : {} })
     .then((r) => r.data);
 
-export const fetchNetworkRecords = (): Promise<FlowRecord[]> =>
-  apiClient.get<FlowRecord[]>('/api/v1/reporter/records').then((r) => r.data);
-
-export const fetchDrift = (): Promise<DataDriftResult> =>
-  fetchNetworkRecords().then((records) =>
-    apiClient.post<DataDriftResult>('/api/v1/reporter/evaluate-drift', { records }).then((r) => r.data)
-  );
+export const fetchDrift = (modelVersion?: string): Promise<DataDriftResult> =>
+  apiClient
+    .post<DataDriftResult>('/api/v1/reporter/evaluate-drift', null, {
+      params: modelVersion ? { model_version: modelVersion } : {},
+    })
+    .then((r) => r.data);
 
 export const fetchModelHealth = (): Promise<ModelHealthResponse> =>
   apiClient.get<ModelHealthResponse>('/api/v1/reporter/model-health').then((r) => r.data);

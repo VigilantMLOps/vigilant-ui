@@ -50,7 +50,7 @@ export default function FeatureDrift() {
 
   const { data: drift, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ['drift', modelVersion],
-    queryFn: () => fetchDrift(),
+    queryFn: () => fetchDrift(modelVersion || undefined),
     staleTime: 5 * 60_000,
     enabled: !isAtoModel,
   });
