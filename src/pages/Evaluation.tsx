@@ -421,13 +421,15 @@ function DataTab({ reports, modelVersion }: { reports: ReportRecord[]; modelVers
         <select
           value={selected.report_id}
           onChange={(e) => { setSelectedId(e.target.value); setFeatureSearch(''); }}
-          className="w-full sm:w-72 px-3 py-2 rounded-lg text-xs font-mono border bg-white text-gray-700 border-gray-200 focus:outline-none focus:border-blue-500 transition-colors dark:bg-gray-900 dark:text-gray-300 dark:border-gray-800"
+          className="w-full px-3 py-2.5 rounded-lg text-sm font-mono border bg-white text-gray-700 border-gray-200 focus:outline-none focus:border-blue-500 transition-colors dark:bg-gray-900 dark:text-gray-300 dark:border-gray-800"
         >
-          {dataReports.map((r) => (
-            <option key={r.report_id} value={r.report_id}>
-              {r.model_version ?? 'unknown'}
-            </option>
-          ))}
+          {[...dataReports]
+            .sort((a, b) => (a.model_version ?? '').localeCompare(b.model_version ?? ''))
+            .map((r) => (
+              <option key={r.report_id} value={r.report_id}>
+                {r.model_version ?? 'unknown'}
+              </option>
+            ))}
         </select>
       </div>
 
